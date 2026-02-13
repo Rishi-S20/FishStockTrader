@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time
+import randStock
 
 cap = cv2.VideoCapture(0)
 last_check = time.time()
@@ -9,26 +10,31 @@ RUN_DURATION = 60
 CHECK_INTERVAL = 5  
 leftCounter = 0
 rightCounter = 0
+winner = ""
+
 
 frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 
 
+rightStock = randStock.getRandStock()
+leftStock = randStock.getRandStock()
+
 while True:
 
 
-    # Stop after 1 minute
     if time.time() - start_time >= RUN_DURATION:
         print("1 minute elapsed. Stopping...")
         break
 
+    
     _, frame = cap.read()
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    lower_blue = np.array([60, 35, 140])
-    upper_blue = np.array([180, 255, 255])
+    lower_green = np.array([35, 50, 50])
+    upper_green = np.array([85, 255, 255])
 
-    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+    mask = cv2.inRange(hsv, lower_green, upper_green)
 
     result = cv2.bitwise_and(frame, frame, mask=mask)
 
@@ -63,6 +69,8 @@ cv2.destroyAllWindows()
 print("Exiting...")
 
 if leftCounter > rightCounter:
-    print("left wins")
+    print("left wins: " + winner)
+    winner = leftStock
 if rightCounter > leftCounter:
-    print("right wins")
+    winner = rightStock
+    print("right wins: " + winner)
