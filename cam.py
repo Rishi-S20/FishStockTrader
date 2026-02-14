@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import time
 import randStock
+import trade
 
 cap = cv2.VideoCapture(0)
 last_check = time.time()
@@ -10,7 +11,6 @@ RUN_DURATION = 60
 CHECK_INTERVAL = 5  
 leftCounter = 0
 rightCounter = 0
-winner = ""
 
 
 frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -23,7 +23,7 @@ while True:
 
 
     if time.time() - start_time >= RUN_DURATION:
-        print("1 minute elapsed. Stopping...")
+        print("TIME IS UP")
         break
 
     
@@ -68,9 +68,25 @@ cap.release()
 cv2.destroyAllWindows()
 print("Exiting...")
 
+winner = None
 if leftCounter > rightCounter:
-    print("left wins: " + winner)
     winner = leftStock
-if rightCounter > leftCounter:
+    print(f"Left Stock wins: {winner}")
+elif rightCounter > leftCounter:
     winner = rightStock
-    print("right wins: " + winner)
+    print(f"Right Stock wins: {winner}")
+else:
+    print("Tie")
+
+
+if winner:
+    retries = 0
+    while not trade.is_tradeable(winner) and retries < 10:
+        print(f"{winner} not tradeable, re-rolling...")
+        winner = randStock.getRandStock()
+        retries += 1
+
+    if trade.is_tradeable(winner):
+        trade.place_trade(winner, amount=100)
+    else:
+        print("Couldn't find a tradeable stock after 10 tries.")

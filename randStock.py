@@ -1,18 +1,15 @@
 import requests
+import random
 
 
 def getRandStock ():
 
-    url = "https://random-stocks-api.p.rapidapi.com/api/random-stocks"
+    url = "https://dumbstockapi.com/stock?format=tickers-only&exchange=NYSE"
 
-    headers = {
-        "x-rapidapi-key": "67e2ef61d6msha2b4e4e13420b83p196858jsn2ed01aef0731",
-        "x-rapidapi-host": "random-stocks-api.p.rapidapi.com"
-    }
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url)
 
     data = response.json()
-    return (data["stocks"])  
+    return (random.choice(data))  
 
 
